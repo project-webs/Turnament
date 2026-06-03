@@ -1,35 +1,44 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\TournamentMatch;
 use App\Services\BracketService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 
 class MatchController extends Controller
 {
     public function __construct(private BracketService $bracketService) {}
 
-    public function index()
+    public function index(Request $request)
     {
-        $matches = TournamentMatch::whereHas('tournament', function ($query) {
-                $query->where('user_id', Auth::id());
+        $matches = TournamentMatch::whereHas('tournament', function ($query) use ($request) {
+                $query->where('user_id', $request->user()->id);
             })
             ->with(['tournament', 'participant1', 'participant2', 'winner'])
             ->latest()
             ->paginate(15);
 
-        return view('matches.index', compact('matches'));
+        return response()->json($matches);
+    }
+
+    public function show(Request $request, TournamentMatch $match)
+    {
+        if ($match->tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
+
+        $match->load(['tournament', 'participant1', 'participant2', 'winner']);
+
+        return response()->json(['data' => $match]);
     }
 
     public function update(Request $request, TournamentMatch $match)
     {
         $tournament = $match->tournament;
-        $this->authorize('update', $tournament);
+        if ($tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
 
         if ($match->is_bye) {
-            return back()->with('error', 'Match BYE tidak perlu diisi skor.');
+            return response()->json(['message' => 'Match BYE tidak perlu diisi skor.'], 422);
         }
 
         $request->validate([
@@ -47,7 +56,6 @@ class MatchController extends Controller
             $pointHistory = [];
             foreach ($request->points_p1 as $index => $p1Score) {
                 $p2Score = $request->points_p2[$index] ?? 0;
-                // Only save if at least one player scored something
                 if ($p1Score > 0 || $p2Score > 0) {
                     $pointHistory[] = [
                         'p1' => (int) $p1Score,
@@ -65,25 +73,24 @@ class MatchController extends Controller
             'status'        => 'finished',
         ]);
 
-        // Advance winner to next round
         $this->bracketService->advanceWinner($match);
-
-        // Check if tournament is finished
         $this->bracketService->checkTournamentFinished($tournament);
 
-        return back()->with('success', 'Skor berhasil disimpan!');
+        return response()->json([
+            'message' => 'Skor berhasil disimpan!',
+            'data' => $match
+        ]);
     }
 
-    public function reset(TournamentMatch $match)
+    public function reset(Request $request, TournamentMatch $match)
     {
         $tournament = $match->tournament;
-        $this->authorize('update', $tournament);
+        if ($tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
 
         if ($match->is_bye) {
-            return back()->with('error', 'Match BYE tidak bisa di-reset.');
+            return response()->json(['message' => 'Match BYE tidak bisa di-reset.'], 422);
         }
 
-        // Remove winner from next match if already advanced
         if ($match->next_match_id && $match->winner_id) {
             $nextMatch = TournamentMatch::find($match->next_match_id);
             if ($nextMatch) {
@@ -111,11 +118,10 @@ class MatchController extends Controller
             'status'        => 'pending',
         ]);
 
-        // Revert tournament to ongoing if it was finished
         if ($tournament->status === 'finished') {
             $tournament->update(['status' => 'ongoing']);
         }
 
-        return back()->with('success', 'Skor berhasil direset.');
+        return response()->json(['message' => 'Skor berhasil direset.']);
     }
 }

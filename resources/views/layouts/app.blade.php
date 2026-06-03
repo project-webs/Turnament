@@ -537,6 +537,11 @@
             <i class="fa-solid fa-trophy"></i>
             Turnamen Saya
         </a>
+        <a href="{{ route('friendly-matches.index') }}"
+           class="nav-link {{ request()->routeIs('friendly-matches.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-handshake"></i>
+            Pertandingan Persahabatan
+        </a>
         <a href="{{ route('tournaments.create') }}"
            class="nav-link {{ request()->routeIs('tournaments.create') ? 'active' : '' }}">
             <i class="fa-solid fa-plus-circle"></i>

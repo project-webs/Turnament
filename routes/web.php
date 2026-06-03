@@ -46,6 +46,11 @@ Route::middleware(['auth'])->group(function () {
     Route::delete('/tournaments/{tournament}/participants/{participant}', [ParticipantController::class, 'destroy'])
         ->name('participants.destroy');
 
+    // Friendly Matches
+    Route::resource('friendly-matches', \App\Http\Controllers\FriendlyMatchController::class)->except(['edit', 'update']);
+    Route::post('/friendly-matches/{friendly_match}/games', [\App\Http\Controllers\FriendlyMatchGameController::class, 'store'])->name('friendly-matches.games.store');
+    Route::delete('/friendly-matches/{friendly_match}/games/{game}', [\App\Http\Controllers\FriendlyMatchGameController::class, 'destroy'])->name('friendly-matches.games.destroy');
+
     // Matches
     Route::patch('/matches/{match}', [MatchController::class, 'update'])->name('matches.update');
     Route::post('/matches/{match}/reset', [MatchController::class, 'reset'])->name('matches.reset');
