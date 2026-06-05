@@ -118,6 +118,25 @@
                               placeholder="Informasi turnamen, lokasi, tanggal, dll...">{{ old('description') }}</textarea>
                 </div>
 
+                <div class="row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="start_date" class="form-label">Tanggal Mulai</label>
+                        <input type="date" id="start_date" name="start_date" class="form-control"
+                               value="{{ old('start_date') }}" onchange="updatePreview()">
+                        @error('start_date')
+                            <div class="form-error" style="color: var(--red); font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-group" style="margin-bottom: 0;">
+                        <label for="end_date" class="form-label">Tanggal Selesai</label>
+                        <input type="date" id="end_date" name="end_date" class="form-control"
+                               value="{{ old('end_date') }}" onchange="updatePreview()">
+                        @error('end_date')
+                            <div class="form-error" style="color: var(--red); font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                        @enderror
+                    </div>
+                </div>
+
                 <hr class="divider">
 
                 <div class="card-title" style="margin-bottom:16px">
@@ -193,6 +212,10 @@
                 <span class="preview-stat-value" id="prev-format">Single Elimination</span>
             </div>
             <div class="preview-stat">
+                <span class="preview-stat-label">Tanggal</span>
+                <span class="preview-stat-value" id="prev-dates">-</span>
+            </div>
+            <div class="preview-stat">
                 <span class="preview-stat-label">Juara 3</span>
                 <span class="preview-stat-value" id="prev-third">Tidak</span>
             </div>
@@ -239,6 +262,37 @@ function updatePreview() {
 
     document.getElementById('prev-third').textContent = thirdPlace ? 'Ya' : 'Tidak';
     document.getElementById('prev-seeded').textContent = seeded ? 'Ya (Berdasarkan Seed)' : 'Tidak (Acak)';
+
+    // Date range preview
+    const startDateVal = document.getElementById('start_date').value;
+    const endDateVal = document.getElementById('end_date').value;
+    let dateStr = '-';
+    
+    if (startDateVal || endDateVal) {
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            const d = new Date(dateString);
+            if (isNaN(d.getTime())) return '';
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+            return `${String(d.getDate()).padStart(2, '0')} ${months[d.getMonth()]} ${d.getFullYear()}`;
+        };
+
+        const startFormatted = formatDate(startDateVal);
+        const endFormatted = formatDate(endDateVal);
+
+        if (startFormatted && endFormatted) {
+            if (startDateVal === endDateVal) {
+                dateStr = startFormatted;
+            } else {
+                dateStr = `${startFormatted} - ${endFormatted}`;
+            }
+        } else if (startFormatted) {
+            dateStr = startFormatted;
+        } else if (endFormatted) {
+            dateStr = endFormatted;
+        }
+    }
+    document.getElementById('prev-dates').textContent = dateStr;
 }
 
 document.addEventListener('DOMContentLoaded', updatePreview);

@@ -63,6 +63,25 @@
                 <textarea id="description" name="description" class="form-control">{{ old('description', $tournament->description) }}</textarea>
             </div>
 
+            <div class="row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 20px;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="start_date" class="form-label">Tanggal Mulai</label>
+                    <input type="date" id="start_date" name="start_date" class="form-control"
+                           value="{{ old('start_date', $tournament->start_date?->format('Y-m-d')) }}">
+                    @error('start_date')
+                        <div class="form-error" style="color: var(--red); font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="end_date" class="form-label">Tanggal Selesai</label>
+                    <input type="date" id="end_date" name="end_date" class="form-control"
+                           value="{{ old('end_date', $tournament->end_date?->format('Y-m-d')) }}">
+                    @error('end_date')
+                        <div class="form-error" style="color: var(--red); font-size: 12px; margin-top: 4px;">{{ $message }}</div>
+                    @enderror
+                </div>
+            </div>
+
             <hr class="divider">
 
             <div class="form-group">

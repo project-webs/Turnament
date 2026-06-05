@@ -122,7 +122,8 @@
 .tc-meta {
     display: flex;
     align-items: center;
-    gap: 16px;
+    flex-wrap: wrap;
+    gap: 10px 16px;
     margin-top: 16px;
     padding-top: 16px;
     border-top: 1px solid var(--border);
@@ -201,7 +202,7 @@
 @else
     <div class="tournament-grid">
         @foreach($tournaments as $tournament)
-        <a href="{{ route('tournaments.show', $tournament) }}" class="tournament-card" id="tc-{{ $tournament->id }}">
+        <div onclick="window.location='{{ route('tournaments.show', $tournament) }}'" class="tournament-card" id="tc-{{ $tournament->id }}">
             <div class="tc-header">
                 <div>
                     <div class="tc-name">{{ $tournament->name }}</div>
@@ -216,6 +217,12 @@
             </div>
 
             <div class="tc-meta">
+                @if($tournament->start_date || $tournament->end_date)
+                <div class="tc-meta-item">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>{{ $tournament->formatted_date_range }}</span>
+                </div>
+                @endif
                 <div class="tc-meta-item">
                     <i class="fa-solid fa-users"></i>
                     <span>{{ $tournament->participants_count ?? $tournament->participant_count }} peserta</span>
@@ -232,12 +239,24 @@
                 @endif
             </div>
 
-            <div class="tc-actions">
-                <span class="btn btn-primary btn-sm">
+            <div class="tc-actions" onclick="event.stopPropagation()">
+                <a href="{{ route('tournaments.show', $tournament) }}" class="btn btn-primary btn-sm">
                     <i class="fa-solid fa-eye"></i> Lihat Bracket
-                </span>
+                </a>
+                @if($tournament->status === 'pending')
+                    <a href="{{ route('tournaments.edit', $tournament) }}" class="btn btn-secondary btn-sm">
+                        <i class="fa-solid fa-pen"></i> Edit
+                    </a>
+                @endif
+                <form method="POST" action="{{ route('tournaments.destroy', $tournament) }}" style="display: inline;" onsubmit="return confirm('Yakin ingin menghapus turnamen ini?')">
+                    @csrf
+                    @method('DELETE')
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="fa-solid fa-trash"></i> Hapus
+                    </button>
+                </form>
             </div>
-        </a>
+        </div>
         @endforeach
     </div>
 

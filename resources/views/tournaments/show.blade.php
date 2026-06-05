@@ -248,6 +248,28 @@
     transition: all var(--transition);
 }
 .participant-item:hover { border-color: var(--border-light); }
+.participant-item.draggable {
+    cursor: grab;
+    user-select: none;
+}
+.participant-item.dragging {
+    opacity: 0.4;
+    background: var(--bg-card-hover);
+    border-style: dashed;
+    border-color: var(--accent);
+}
+.drag-handle {
+    cursor: grab;
+    color: var(--text-muted);
+    font-size: 14px;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    transition: color var(--transition);
+}
+.drag-handle:hover {
+    color: var(--accent);
+}
 .participant-num {
     width: 28px; height: 28px;
     background: var(--accent-light);
@@ -736,7 +758,7 @@
                     </div>
                 @endif
 
-                @if($tournament->status === 'ongoing')
+                @if($tournament->status === 'ongoing' || $tournament->status === 'finished')
                 <div style="margin-top:20px">
                     <form method="POST" action="{{ route('tournaments.reset-bracket', $tournament) }}"
                           onsubmit="return confirm('Reset bracket? Semua skor akan dihapus.')">
@@ -837,9 +859,16 @@
                         <p>Tambahkan peserta menggunakan form di atas</p>
                     </div>
                 @else
-                    <div class="participants-list">
+                    <div class="participants-list" id="participants-sortable-list">
                         @foreach($tournament->participants as $i => $participant)
-                            <div class="participant-item">
+                            <div class="participant-item {{ ($tournament->status === 'pending' && $tournament->seeded) ? 'draggable' : '' }}" 
+                                 @if($tournament->status === 'pending' && $tournament->seeded) draggable="true" @endif 
+                                 data-id="{{ $participant->id }}">
+                                @if($tournament->status === 'pending' && $tournament->seeded)
+                                    <div class="drag-handle" title="Tarik untuk mengurutkan">
+                                        <i class="fa-solid fa-grip-lines"></i>
+                                    </div>
+                                @endif
                                 <div class="participant-num">{{ $i + 1 }}</div>
                                 <div class="participant-name">
                                     {{ $participant->name }}
@@ -854,8 +883,8 @@
                                         </div>
                                     @endif
                                 </div>
-                                @if($participant->seed)
-                                    <span class="participant-seed">Seed #{{ $participant->seed }}</span>
+                                @if($tournament->seeded)
+                                    <span class="participant-seed">Seed #{{ $participant->seed ?? ($i + 1) }}</span>
                                 @endif
                                 @if($tournament->status === 'pending')
                                     <form method="POST" action="{{ route('participants.destroy', [$tournament, $participant]) }}">
@@ -883,6 +912,10 @@
             <div class="info-row">
                 <span class="info-row-label">Status</span>
                 <span class="badge badge-{{ $tournament->status_color }}">{{ $tournament->status_label }}</span>
+            </div>
+            <div class="info-row">
+                <span class="info-row-label">Tanggal</span>
+                <span class="info-row-val">{{ $tournament->formatted_date_range }}</span>
             </div>
             <div class="info-row">
                 <span class="info-row-label">Peserta</span>
@@ -1165,6 +1198,109 @@ document.querySelectorAll('input[name="winner_id"]').forEach((radio, i) => {
 
 document.querySelectorAll('label[id^="winner-option"]').forEach((lbl, i) => {
     lbl.addEventListener('click', () => highlightWinner(i + 1));
+});
+
+// Drag and drop sorting for participants
+document.addEventListener('DOMContentLoaded', () => {
+    const list = document.getElementById('participants-sortable-list');
+    if (!list) return;
+
+    let dragEl = null;
+
+    const items = list.querySelectorAll('.participant-item.draggable');
+    if (items.length === 0) return;
+
+    items.forEach(item => {
+        item.addEventListener('dragstart', (e) => {
+            dragEl = item;
+            item.classList.add('dragging');
+            e.dataTransfer.effectAllowed = 'move';
+            e.dataTransfer.setData('text/html', item.innerHTML);
+        });
+
+        item.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'move';
+            
+            const bounding = item.getBoundingClientRect();
+            const offset = bounding.y + bounding.height / 2;
+            
+            if (e.clientY - offset > 0) {
+                item.style.borderBottom = '2px solid var(--accent)';
+                item.style.borderTop = '';
+            } else {
+                item.style.borderTop = '2px solid var(--accent)';
+                item.style.borderBottom = '';
+            }
+        });
+
+        item.addEventListener('dragleave', () => {
+            item.style.borderTop = '';
+            item.style.borderBottom = '';
+        });
+
+        item.addEventListener('dragend', () => {
+            item.classList.remove('dragging');
+            items.forEach(el => {
+                el.style.borderTop = '';
+                el.style.borderBottom = '';
+            });
+        });
+
+        item.addEventListener('drop', (e) => {
+            e.preventDefault();
+            item.style.borderTop = '';
+            item.style.borderBottom = '';
+            
+            if (dragEl !== item) {
+                const bounding = item.getBoundingClientRect();
+                const offset = bounding.y + bounding.height / 2;
+                
+                if (e.clientY - offset > 0) {
+                    item.after(dragEl);
+                } else {
+                    item.before(dragEl);
+                }
+                
+                saveParticipantsOrder();
+            }
+        });
+    });
+
+    function saveParticipantsOrder() {
+        const sortedItems = Array.from(list.querySelectorAll('.participant-item'));
+        const order = sortedItems.map(item => item.dataset.id);
+
+        sortedItems.forEach((item, index) => {
+            const numEl = item.querySelector('.participant-num');
+            if (numEl) numEl.textContent = index + 1;
+            
+            const seedEl = item.querySelector('.participant-seed');
+            if (seedEl) seedEl.textContent = `Seed #${index + 1}`;
+        });
+
+        fetch('{{ route("participants.sort", $tournament) }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ order: order })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.error) {
+                alert(data.error);
+                window.location.reload();
+            }
+        })
+        .catch(err => {
+            console.error('Error saving participant order:', err);
+            alert('Gagal menyimpan urutan peserta. Silakan coba lagi.');
+            window.location.reload();
+        });
+    }
 });
 </script>
 @endpush

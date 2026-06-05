@@ -35,6 +35,8 @@ class TournamentController extends Controller
             'type'               => 'required|in:single_elimination,round_robin',
             'third_place_match'  => 'nullable|boolean',
             'seeded'             => 'nullable|boolean',
+            'start_date'         => 'nullable|date',
+            'end_date'           => 'nullable|date|after_or_equal:start_date',
         ]);
 
         $tournament = Auth::user()->tournaments()->create([
@@ -44,6 +46,8 @@ class TournamentController extends Controller
             'third_place_match' => $validated['type'] === 'single_elimination' ? $request->boolean('third_place_match') : false,
             'seeded'            => $request->boolean('seeded'),
             'status'            => 'pending',
+            'start_date'        => $validated['start_date'] ?? null,
+            'end_date'          => $validated['end_date'] ?? null,
         ]);
 
         return redirect()->route('tournaments.show', $tournament)
@@ -98,6 +102,8 @@ class TournamentController extends Controller
             'type'              => 'required|in:single_elimination,round_robin',
             'third_place_match' => 'nullable|boolean',
             'seeded'            => 'nullable|boolean',
+            'start_date'        => 'nullable|date',
+            'end_date'          => 'nullable|date|after_or_equal:start_date',
         ]);
 
         $tournament->update([
@@ -106,6 +112,8 @@ class TournamentController extends Controller
             'type'              => $validated['type'],
             'third_place_match' => $validated['type'] === 'single_elimination' ? $request->boolean('third_place_match') : false,
             'seeded'            => $request->boolean('seeded'),
+            'start_date'        => $validated['start_date'] ?? null,
+            'end_date'          => $validated['end_date'] ?? null,
         ]);
 
         return redirect()->route('tournaments.show', $tournament)

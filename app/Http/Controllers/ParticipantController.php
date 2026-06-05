@@ -101,4 +101,26 @@ class ParticipantController extends Controller
 
         return back()->with('success', 'Peserta berhasil dihapus.');
     }
+
+    public function updateOrder(Request $request, Tournament $tournament)
+    {
+        $this->authorize('update', $tournament);
+
+        if ($tournament->status !== 'pending') {
+            return response()->json(['error' => 'Turnamen sudah dimulai.'], 403);
+        }
+
+        $request->validate([
+            'order' => 'required|array',
+            'order.*' => 'required|exists:participants,id',
+        ]);
+
+        foreach ($request->order as $index => $id) {
+            $tournament->participants()->where('id', $id)->update([
+                'seed' => $index + 1,
+            ]);
+        }
+
+        return response()->json(['success' => true]);
+    }
 }

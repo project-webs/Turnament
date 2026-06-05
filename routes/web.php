@@ -43,6 +43,8 @@ Route::middleware(['auth'])->group(function () {
         ->name('participants.store');
     Route::post('/tournaments/{tournament}/participants/bulk', [ParticipantController::class, 'bulkStore'])
         ->name('participants.bulk-store');
+    Route::post('/tournaments/{tournament}/participants/sort', [ParticipantController::class, 'updateOrder'])
+        ->name('participants.sort');
     Route::delete('/tournaments/{tournament}/participants/{participant}', [ParticipantController::class, 'destroy'])
         ->name('participants.destroy');
 

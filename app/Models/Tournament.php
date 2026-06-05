@@ -12,11 +12,14 @@ class Tournament extends Model
     protected $fillable = [
         'user_id', 'name', 'slug', 'description', 'type',
         'status', 'third_place_match', 'seeded', 'participant_count',
+        'start_date', 'end_date',
     ];
 
     protected $casts = [
         'third_place_match' => 'boolean',
         'seeded'            => 'boolean',
+        'start_date'        => 'date',
+        'end_date'          => 'date',
     ];
 
     protected static function booted(): void
@@ -46,6 +49,27 @@ class Tournament extends Model
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function getFormattedDateRangeAttribute(): string
+    {
+        if (!$this->start_date && !$this->end_date) {
+            return '-';
+        }
+        
+        if ($this->start_date && !$this->end_date) {
+            return $this->start_date->format('d M Y');
+        }
+        
+        if (!$this->start_date && $this->end_date) {
+            return $this->end_date->format('d M Y');
+        }
+        
+        if ($this->start_date->format('Y-m-d') === $this->end_date->format('Y-m-d')) {
+            return $this->start_date->format('d M Y');
+        }
+        
+        return $this->start_date->format('d M Y') . ' - ' . $this->end_date->format('d M Y');
     }
 
     public function getTotalRoundsAttribute(): int
