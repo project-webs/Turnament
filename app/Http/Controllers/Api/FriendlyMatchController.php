@@ -22,7 +22,9 @@ class FriendlyMatchController extends Controller
             'notes'         => 'nullable|string',
         ]);
 
-        $match = FriendlyMatch::query()->create($validated);
+        $match = FriendlyMatch::query()->create(array_merge($validated, [
+            'user_id' => $request->user()->id,
+        ]));
 
         return response()->json([
             'message' => 'Pertemuan berhasil ditambahkan.',
