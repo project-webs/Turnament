@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dashboard') — TenisMeja Tournament</title>
-    <meta name="description" content="@yield('meta_description', 'Platform manajemen turnamen tenis meja — buat bracket, kelola peserta, dan catat hasil pertandingan.')">
+    <meta name="description" content="@yield('meta_description', 'Platform manajemen turnamen tenis meja — buat bracket, kelola Pemain, dan catat hasil pertandingan.')">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -552,7 +552,12 @@
         <a href="{{ route('players.index') }}"
            class="nav-link {{ request()->routeIs('players.*') ? 'active' : '' }}">
             <i class="fa-solid fa-users"></i>
-            Data Peserta
+            Data Pemain
+        </a>
+        <a href="{{ route('iuran.index') }}"
+           class="nav-link {{ request()->routeIs('iuran.*') ? 'active' : '' }}">
+            <i class="fa-solid fa-money-bill-wave"></i>
+            Iuran Pemain
         </a>
         <a href="{{ route('users.index') }}"
            class="nav-link {{ request()->routeIs('users.*') ? 'active' : '' }}">

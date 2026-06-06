@@ -26,6 +26,28 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="gender" class="form-label">Jenis Kelamin</label>
+                    <select name="gender" id="gender" class="form-control">
+                        <option value="">-- Pilih Jenis Kelamin --</option>
+                        <option value="Laki-laki" {{ old('gender') == 'Laki-laki' ? 'selected' : '' }}>Laki-laki</option>
+                        <option value="Perempuan" {{ old('gender') == 'Perempuan' ? 'selected' : '' }}>Perempuan</option>
+                    </select>
+                    @error('gender') <div class="form-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="nik" class="form-label">No. KTP (NIK)</label>
+                    <input type="text" name="nik" id="nik" class="form-control" value="{{ old('nik') }}" placeholder="Contoh: 3171234567890001">
+                    @error('nik') <div class="form-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
+                    <label for="address" class="form-label">Alamat Lengkap</label>
+                    <textarea name="address" id="address" class="form-control" placeholder="Contoh: Jl. Sudirman No. 1, Jakarta">{{ old('address') }}</textarea>
+                    @error('address') <div class="form-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
                     <label for="division" class="form-label">Divisi (Opsional)</label>
                     <input type="text" name="division" id="division" class="form-control" value="{{ old('division') }}" placeholder="Contoh: Divisi 1, Umum, U-19">
                     <div class="form-hint">Digunakan untuk mengkategorikan kemampuan atau kelompok umur pemain.</div>

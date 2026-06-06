@@ -9,6 +9,37 @@ use Illuminate\Http\Request;
 
 class ParticipantController extends Controller
 {
+    public function index(Request $request, Tournament $tournament)
+    {
+        if ($tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
+        return response()->json(['data' => $tournament->participants]);
+    }
+
+    public function show(Request $request, Tournament $tournament, Participant $participant)
+    {
+        if ($tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
+        if ($participant->tournament_id !== $tournament->id) abort(404);
+        return response()->json(['data' => $participant]);
+    }
+
+    public function update(Request $request, Tournament $tournament, Participant $participant)
+    {
+        if ($tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
+        if ($participant->tournament_id !== $tournament->id) abort(404);
+
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:100',
+            'seed' => 'nullable|integer|min:1'
+        ]);
+
+        $participant->update($validated);
+
+        return response()->json([
+            'message' => 'Peserta berhasil diupdate.',
+            'data' => $participant
+        ]);
+    }
+
     public function store(Request $request, Tournament $tournament)
     {
         if ($tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');

@@ -30,12 +30,14 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users',
+            'role'     => 'required|in:admin,pemain',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         User::create([
             'name'     => $validated['name'],
             'email'    => $validated['email'],
+            'role'     => $validated['role'],
             'password' => \Illuminate\Support\Facades\Hash::make($validated['password']),
         ]);
 
@@ -57,11 +59,13 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'     => 'required|string|max:255',
             'email'    => 'required|string|email|max:255|unique:users,email,' . $user->id,
+            'role'     => 'required|in:admin,pemain',
             'password' => 'nullable|string|min:8|confirmed',
         ]);
 
         $user->name  = $validated['name'];
         $user->email = $validated['email'];
+        $user->role  = $validated['role'];
 
         if (!empty($validated['password'])) {
             $user->password = \Illuminate\Support\Facades\Hash::make($validated['password']);

@@ -14,6 +14,8 @@ class TournamentMatch extends Model
         'is_bye', 'point_history', 'is_rating_processed',
     ];
 
+    protected $appends = ['player1_name', 'player2_name'];
+
     protected $casts = [
         'next_match_slot' => 'boolean',
         'is_bye' => 'boolean',

@@ -57,6 +57,7 @@ class TournamentController extends Controller
             'matches.winner',
         ]);
 
+        $tournament->append('standings');
         return response()->json(['data' => $tournament]);
     }
 

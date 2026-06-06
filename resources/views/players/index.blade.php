@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
-@section('title', 'Master Data Peserta')
-@section('page-title', 'Master Data Peserta')
+@section('title', 'Master Data Pemain')
+@section('page-title', 'Master Data Pemain')
 
 @section('topbar-actions')
     <div style="display:flex;gap:12px;align-items:center">
@@ -15,7 +15,7 @@
             </button>
         </form>
         <a href="{{ route('players.create') }}" class="btn btn-primary">
-            <i class="fa-solid fa-user-plus"></i> Tambah Peserta
+            <i class="fa-solid fa-user-plus"></i> Tambah Pemain
         </a>
     </div>
 @endsection
@@ -25,7 +25,7 @@
         <form method="GET" action="{{ route('players.index') }}" style="display:flex;gap:12px;align-items:center">
             <div style="position:relative;flex:1;max-width:400px">
                 <i class="fa-solid fa-search" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--text-muted)"></i>
-                <input type="text" name="search" class="form-control" placeholder="Cari nama peserta..." value="{{ request('search') }}" style="padding-left:40px">
+                <input type="text" name="search" class="form-control" placeholder="Cari nama Pemain..." value="{{ request('search') }}" style="padding-left:40px">
             </div>
             <button type="submit" class="btn btn-secondary">Cari</button>
             @if(request('search'))
@@ -40,9 +40,10 @@
                 <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:600px">
                     <thead>
                         <tr style="border-bottom:2px solid var(--border);color:var(--text-muted);text-align:left">
-                            <th style="padding:16px;font-weight:600;width:40%">Nama Pemain</th>
-                            <th style="padding:16px;font-weight:600;width:25%">Divisi</th>
-                            <th style="padding:16px;font-weight:600;width:20%">ITR Rating</th>
+                            <th style="padding:16px;font-weight:600;width:30%">Nama Pemain</th>
+                            <th style="padding:16px;font-weight:600;width:20%">Info Diri</th>
+                            <th style="padding:16px;font-weight:600;width:20%">Divisi</th>
+                            <th style="padding:16px;font-weight:600;width:15%">ITR Rating</th>
                             <th style="padding:16px;font-weight:600;text-align:right">Aksi</th>
                         </tr>
                     </thead>
@@ -51,6 +52,10 @@
                         <tr style="border-bottom:1px solid var(--border)">
                             <td style="padding:16px;font-weight:600;color:var(--text-primary)">
                                 {{ $player->name }}
+                            </td>
+                            <td style="padding:16px;color:var(--text-secondary)">
+                                <div style="font-size:12px;margin-bottom:4px"><i class="fa-solid fa-venus-mars" style="width:14px;text-align:center"></i> {{ $player->gender ?: '-' }}</div>
+                                <div style="font-size:12px"><i class="fa-solid fa-id-card" style="width:14px;text-align:center"></i> {{ $player->nik ?: '-' }}</div>
                             </td>
                             <td style="padding:16px;color:var(--text-secondary)">
                                 @if($player->division)
@@ -69,7 +74,7 @@
                                     <a href="{{ route('players.edit', $player) }}" class="btn btn-secondary btn-icon" title="Edit">
                                         <i class="fa-solid fa-pen"></i>
                                     </a>
-                                    <form method="POST" action="{{ route('players.destroy', $player) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus peserta ini? (Tidak akan menghapus riwayat mereka di turnamen yang sudah berjalan)')">
+                                    <form method="POST" action="{{ route('players.destroy', $player) }}" onsubmit="return confirm('Apakah Anda yakin ingin menghapus Pemain ini? (Tidak akan menghapus riwayat mereka di turnamen yang sudah berjalan)')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-danger btn-icon" title="Hapus">
@@ -90,10 +95,10 @@
         @else
             <div class="empty-state">
                 <i class="fa-solid fa-users-slash"></i>
-                <h3>Belum Ada Data Peserta</h3>
-                <p>Anda belum menambahkan peserta satupun ke dalam master data.</p>
+                <h3>Belum Ada Data Pemain</h3>
+                <p>Anda belum menambahkan Pemain satupun ke dalam master data.</p>
                 <a href="{{ route('players.create') }}" class="btn btn-primary">
-                    <i class="fa-solid fa-plus"></i> Tambah Peserta Pertama
+                    <i class="fa-solid fa-plus"></i> Tambah Pemain Pertama
                 </a>
             </div>
         @endif

@@ -32,6 +32,15 @@
                     @error('email') <div class="form-error">{{ $message }}</div> @enderror
                 </div>
 
+                <div class="form-group">
+                    <label for="role" class="form-label">Role <span style="color:var(--red)">*</span></label>
+                    <select name="role" id="role" class="form-control" required>
+                        <option value="pemain" {{ old('role', $user->role ?? 'pemain') == 'pemain' ? 'selected' : '' }}>Pemain</option>
+                        <option value="admin" {{ old('role', $user->role ?? 'pemain') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    </select>
+                    @error('role') <div class="form-error">{{ $message }}</div> @enderror
+                </div>
+
                 <div class="divider"></div>
                 <div class="card-title" style="margin-bottom:16px;font-size:14px">Ganti Password (Opsional)</div>
 

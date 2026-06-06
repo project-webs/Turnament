@@ -11,6 +11,28 @@ class MatchController extends Controller
 {
     public function __construct(private BracketService $bracketService) {}
 
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'tournament_id' => 'required|exists:tournaments,id',
+            'participant1_id' => 'nullable|exists:participants,id',
+            'participant2_id' => 'nullable|exists:participants,id',
+            'round' => 'required|integer',
+            'match_number' => 'required|integer',
+            'is_bye' => 'boolean'
+        ]);
+
+        $match = TournamentMatch::create($validated);
+        return response()->json(['message' => 'Match created', 'data' => $match], 201);
+    }
+
+    public function destroy(Request $request, TournamentMatch $match)
+    {
+        if ($match->tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
+        $match->delete();
+        return response()->json(['message' => 'Match deleted']);
+    }
+
     public function index(Request $request)
     {
         $matches = TournamentMatch::whereHas('tournament', function ($query) use ($request) {

@@ -29,8 +29,9 @@
                 <table style="width:100%;border-collapse:collapse;font-size:14px;min-width:600px">
                     <thead>
                         <tr style="border-bottom:2px solid var(--border);color:var(--text-muted);text-align:left">
-                            <th style="padding:16px;font-weight:600;width:35%">Nama</th>
-                            <th style="padding:16px;font-weight:600;width:40%">Email</th>
+                            <th style="padding:16px;font-weight:600;width:30%">Nama</th>
+                            <th style="padding:16px;font-weight:600;width:30%">Email</th>
+                            <th style="padding:16px;font-weight:600;width:20%">Role</th>
                             <th style="padding:16px;font-weight:600;text-align:right">Aksi</th>
                         </tr>
                     </thead>
@@ -45,6 +46,13 @@
                             </td>
                             <td style="padding:16px;color:var(--text-secondary)">
                                 {{ $user->email }}
+                            </td>
+                            <td style="padding:16px">
+                                @if(($user->role ?? 'pemain') === 'admin')
+                                    <span class="badge badge-yellow">Admin</span>
+                                @else
+                                    <span class="badge badge-gray">Pemain</span>
+                                @endif
                             </td>
                             <td style="padding:16px;text-align:right">
                                 <div style="display:flex;gap:8px;justify-content:flex-end">

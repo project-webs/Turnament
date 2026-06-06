@@ -31,6 +31,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/players/calculate-rating', [PlayerController::class, 'calculateRating'])->name('players.calculate-rating');
     Route::resource('players', PlayerController::class)->except(['show']);
     Route::resource('users', UserController::class);
+    Route::resource('iuran', \App\Http\Controllers\IuranController::class);
 
     // Tournament actions
     Route::post('/tournaments/{tournament}/start', [TournamentController::class, 'start'])

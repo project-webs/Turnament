@@ -37,12 +37,18 @@ class PlayerController extends Controller
     {
         $validated = $request->validate([
             'name'       => 'required|string|max:100',
+            'gender'     => 'nullable|in:Laki-laki,Perempuan',
+            'nik'        => 'nullable|string|max:20',
+            'address'    => 'nullable|string',
             'division'   => 'nullable|string|max:50',
             'itr_rating' => 'nullable|integer|min:0',
         ]);
 
         \Illuminate\Support\Facades\Auth::user()->players()->create([
             'name'       => $validated['name'],
+            'gender'     => $validated['gender'] ?? null,
+            'nik'        => $validated['nik'] ?? null,
+            'address'    => $validated['address'] ?? null,
             'division'   => $validated['division'] ?? null,
             'itr_rating' => $validated['itr_rating'] ?? 0,
         ]);
@@ -66,12 +72,18 @@ class PlayerController extends Controller
 
         $validated = $request->validate([
             'name'       => 'required|string|max:100',
+            'gender'     => 'nullable|in:Laki-laki,Perempuan',
+            'nik'        => 'nullable|string|max:20',
+            'address'    => 'nullable|string',
             'division'   => 'nullable|string|max:50',
             'itr_rating' => 'nullable|integer|min:0',
         ]);
 
         $player->update([
             'name'       => $validated['name'],
+            'gender'     => $validated['gender'] ?? null,
+            'nik'        => $validated['nik'] ?? null,
+            'address'    => $validated['address'] ?? null,
             'division'   => $validated['division'] ?? null,
             'itr_rating' => $validated['itr_rating'] ?? 0,
         ]);

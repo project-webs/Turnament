@@ -16,7 +16,8 @@ class PlayerController extends Controller
             $query->where('name', 'like', '%' . $request->search . '%');
         }
 
-        $players = $query->orderBy('name')->paginate(15);
+        $perPage = $request->input('per_page', 100);
+        $players = $query->orderBy('name')->paginate($perPage);
 
         return response()->json($players);
     }
@@ -25,12 +26,18 @@ class PlayerController extends Controller
     {
         $validated = $request->validate([
             'name'       => 'required|string|max:100',
+            'gender'     => 'nullable|in:Laki-laki,Perempuan',
+            'nik'        => 'nullable|string|max:20',
+            'address'    => 'nullable|string',
             'division'   => 'nullable|string|max:50',
             'itr_rating' => 'nullable|integer|min:0',
         ]);
 
         $player = $request->user()->players()->create([
             'name'       => $validated['name'],
+            'gender'     => $validated['gender'] ?? null,
+            'nik'        => $validated['nik'] ?? null,
+            'address'    => $validated['address'] ?? null,
             'division'   => $validated['division'] ?? null,
             'itr_rating' => $validated['itr_rating'] ?? 0,
         ]);
@@ -54,6 +61,9 @@ class PlayerController extends Controller
 
         $validated = $request->validate([
             'name'       => 'sometimes|required|string|max:100',
+            'gender'     => 'nullable|in:Laki-laki,Perempuan',
+            'nik'        => 'nullable|string|max:20',
+            'address'    => 'nullable|string',
             'division'   => 'nullable|string|max:50',
             'itr_rating' => 'nullable|integer|min:0',
         ]);

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Player extends Model
 {
-    protected $fillable = ['user_id', 'name', 'division', 'itr_rating'];
+    protected $fillable = ['user_id', 'name', 'gender', 'nik', 'address', 'division', 'itr_rating', 'match_played', 'win_count', 'lose_count'];
 
     public function user(): BelongsTo
     {
@@ -19,5 +19,10 @@ class Player extends Model
     public function participants(): HasMany
     {
         return $this->hasMany(Participant::class);
+    }
+
+    public function iurans(): HasMany
+    {
+        return $this->hasMany(Iuran::class);
     }
 }

@@ -32,6 +32,15 @@
                 </div>
 
                 <div class="form-group">
+                    <label for="role" class="form-label">Role <span style="color:var(--red)">*</span></label>
+                    <select name="role" id="role" class="form-control" required>
+                        <option value="pemain" {{ old('role') == 'pemain' ? 'selected' : '' }}>Pemain</option>
+                        <option value="admin" {{ old('role') == 'admin' ? 'selected' : '' }}>Admin</option>
+                    </select>
+                    @error('role') <div class="form-error">{{ $message }}</div> @enderror
+                </div>
+
+                <div class="form-group">
                     <label for="password" class="form-label">Password <span style="color:var(--red)">*</span></label>
                     <input type="password" name="password" id="password" class="form-control" required placeholder="Minimal 8 karakter">
                     @error('password') <div class="form-error">{{ $message }}</div> @enderror

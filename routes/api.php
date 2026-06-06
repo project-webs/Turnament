@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Api\AuthController;
+use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\FriendlyMatchController;
 use App\Http\Controllers\Api\FriendlyMatchGameController;
 use App\Http\Controllers\Api\PlayerController;
@@ -9,18 +11,23 @@ use App\Http\Controllers\Api\TournamentController;
 use App\Http\Controllers\Api\ParticipantController;
 use App\Http\Controllers\Api\MatchController;
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+Route::post('/login', [AuthController::class, 'login']);
 
 Route::middleware('auth:sanctum')->name('api.')->group(function () {
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [AuthController::class, 'user']);
+
+    Route::apiResource('users', UserController::class);
+
     // Friendly Matches
     Route::apiResource('friendly-matches', FriendlyMatchController::class);
-    Route::post('/friendly-matches/{friendly_match}/games', [FriendlyMatchGameController::class, 'store']);
-    Route::delete('/friendly-matches/{friendly_match}/games/{game}', [FriendlyMatchGameController::class, 'destroy']);
+    Route::apiResource('friendly-matches.games', FriendlyMatchGameController::class)->scoped();
 
     // Players
     Route::apiResource('players', PlayerController::class);
+
+    // Iurans
+    Route::apiResource('iurans', \App\Http\Controllers\Api\IuranController::class);
 
     // Tournaments
     Route::apiResource('tournaments', TournamentController::class);
@@ -28,12 +35,9 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::post('/tournaments/{tournament}/reset-bracket', [TournamentController::class, 'resetBracket']);
 
     // Participants
-    Route::post('/tournaments/{tournament}/participants', [ParticipantController::class, 'store']);
-    Route::delete('/tournaments/{tournament}/participants/{participant}', [ParticipantController::class, 'destroy']);
+    Route::apiResource('tournaments.participants', ParticipantController::class)->scoped();
 
     // Tournament Matches
-    Route::get('/matches', [MatchController::class, 'index']);
-    Route::get('/matches/{match}', [MatchController::class, 'show']);
-    Route::put('/matches/{match}', [MatchController::class, 'update']);
+    Route::apiResource('matches', MatchController::class);
     Route::post('/matches/{match}/reset', [MatchController::class, 'reset']);
 });
