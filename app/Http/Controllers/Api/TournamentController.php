@@ -13,7 +13,7 @@ class TournamentController extends Controller
 
     public function index(Request $request)
     {
-        $tournaments = $request->user()->tournaments()
+        $tournaments = Tournament::query()
             ->withCount('participants')
             ->latest()
             ->paginate(12);
@@ -48,8 +48,6 @@ class TournamentController extends Controller
 
     public function show(Request $request, Tournament $tournament)
     {
-        if ($tournament->user_id !== $request->user()->id) abort(403, 'Unauthorized');
-
         $tournament->load([
             'participants.player',
             'matches.participant1',

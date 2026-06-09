@@ -16,6 +16,9 @@ Route::post('/login', [AuthController::class, 'login']);
 // Public Players routes
 Route::apiResource('players', PlayerController::class)->only(['index', 'show']);
 
+// Public Tournaments routes
+Route::apiResource('tournaments', TournamentController::class)->only(['index', 'show']);
+
 Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
@@ -33,7 +36,7 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::apiResource('iurans', \App\Http\Controllers\Api\IuranController::class);
 
     // Tournaments
-    Route::apiResource('tournaments', TournamentController::class);
+    Route::apiResource('tournaments', TournamentController::class)->except(['index', 'show']);
     Route::post('/tournaments/{tournament}/start', [TournamentController::class, 'start']);
     Route::post('/tournaments/{tournament}/reset-bracket', [TournamentController::class, 'resetBracket']);
 
