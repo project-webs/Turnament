@@ -19,6 +19,11 @@ Route::apiResource('players', PlayerController::class)->only(['index', 'show']);
 // Public Tournaments routes
 Route::apiResource('tournaments', TournamentController::class)->only(['index', 'show']);
 
+// Public Friendly Matches routes
+Route::apiResource('friendly-matches', FriendlyMatchController::class)->only(['index', 'show']);
+Route::apiResource('friendly-matches.games', FriendlyMatchGameController::class)->scoped()->only(['index', 'show']);
+
+
 Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [AuthController::class, 'user']);
@@ -26,8 +31,8 @@ Route::middleware('auth:sanctum')->name('api.')->group(function () {
     Route::apiResource('users', UserController::class);
 
     // Friendly Matches
-    Route::apiResource('friendly-matches', FriendlyMatchController::class);
-    Route::apiResource('friendly-matches.games', FriendlyMatchGameController::class)->scoped();
+    Route::apiResource('friendly-matches', FriendlyMatchController::class)->except(['index', 'show']);
+    Route::apiResource('friendly-matches.games', FriendlyMatchGameController::class)->scoped()->except(['index', 'show']);
 
     // Players
     Route::apiResource('players', PlayerController::class)->except(['index', 'show']);
