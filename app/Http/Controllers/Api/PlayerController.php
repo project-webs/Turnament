@@ -10,7 +10,7 @@ class PlayerController extends Controller
 {
     public function index(Request $request)
     {
-        $query = $request->user()->players();
+        $query = Player::query();
 
         if ($request->filled('search')) {
             $query->where('name', 'like', '%' . $request->search . '%');
@@ -50,8 +50,6 @@ class PlayerController extends Controller
 
     public function show(Request $request, Player $player)
     {
-        if ($player->user_id !== $request->user()->id) abort(403, 'Unauthorized');
-        
         return response()->json(['data' => $player]);
     }
 
